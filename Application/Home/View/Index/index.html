@@ -1,0 +1,174 @@
+ <!DOCTYPE html>
+ <html lang="zh-cmn-Hans">
+ <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>AirFight</title>
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div id="map">
+        
+    </div>
+    <form role="form">
+        <div class="form-group">
+            <label for="name">X</label>
+            <select class="form-control" id="corY">
+                <option value="1">A</option>
+                <option value="2">B</option>
+                <option value="3">C</option>
+                <option value="4">D</option>
+                <option value="5">E</option>
+                <option value="6">F</option>
+                <option value="7">G</option>
+                <option value="8">H</option>
+                <option value="9">I</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="name">Y</label>
+            <select class="form-control" id="corX">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="name">DIRECTION</label>
+            <select class="form-control" id="corD">
+                <option value="1">↑</option>
+                <option value="2">↓</option>
+                <option value="3">←</option>
+                <option value="4">→</option>
+            </select>
+        </div>
+        <input id="btnAdd" type="button" name="test" value="add">
+        <input id="btnFresh" type="button" name="test" value="fresh">
+    </form>
+</body>
+<script type="text/javascript">
+    var planeCnt = 0;
+    var planeMap = new Array();
+    for (var i = 0; i < 9; i++) {
+        planeMap[i] = new Array(0,0,0,0,0,0,0,0,0);
+    }
+    var planeType = new Array();
+    planeType[1] = [
+    [0, 0, 1, 0, 0],
+    [1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0]
+    ]
+    planeType[2] = [
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+    [1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0]
+    ]
+    planeType[3] = [
+    [0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0],
+    [1, 1, 1, 1, 0],
+    [0, 1, 0, 1, 0],
+    [0, 1, 0, 0, 0]
+    ]
+    planeType[4] = [
+    [0, 0, 1, 0, 0],
+    [1, 0, 1, 0, 0],
+    [1, 1, 1, 1, 0],
+    [1, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0]
+    ]
+    //console.log(planeMap)
+    $("#btnAdd").click(function() {
+        var corX = $("#corX").val();
+        var corY = $("#corY").val();
+        var corD = $("#corD").val() - 0;
+        var res =  convertXY(corD,corX,corY);
+
+        addPlaneToMap(corD,res[0],res[1])
+        //console.log(res);
+    });
+
+    $("#btnFresh").click(function() {
+        showMap();
+    });
+
+    //转换机头坐标到planeType零点坐标
+    function convertXY(corD,corX,corY) {
+        var resX,resY;
+        switch(corD) {
+            case 1:
+            resX = corX - 2;
+            resY = corY - 0;
+            break;
+            case 2:
+            resX = corX - 2;
+            resY = corY - 3;
+            break;
+            case 3:
+            resX = corX - 0;
+            resY = corY - 2;
+            break;
+            case 4:
+            resX = corX - 3;
+            resY = corY - 2;
+            break;
+            default:
+            alert("ERROR!")
+        }
+        var res = new Array(resX,resY);
+        return res;
+    }
+
+    //添加飞机到自己的地图
+    function addPlaneToMap(corD,resX,resY) {
+        if (planeCnt == 3) {
+            alert("已经添加三架飞机了！");
+            return false;
+        }
+        var planeMapTem = planeMap.concat();
+        for (var i = 0; i < 5; i++) {
+            for (var j = 0; j < 5; j++) {
+                var dot = planeType[corD][i][j];
+                if (!dot) {
+                    continue;
+                }
+                if (planeMapTem[resY - 1 + i][resX - 1 + j] == 0) {
+                    planeMapTem[resY - 1 + i][resX - 1 + j] = 1;
+                    continue;
+                }
+                else{
+                    alert("添加飞机错误！请检查");
+                    console.log(planeMap);
+                    return;
+                }
+            }
+        }
+        console.log(1);
+        planeCnt++;
+        planeMap = planeMapTem;
+        showMap();
+    }
+
+    //显示地图
+    function showMap() {
+        $("#map").html("");
+        for (var i = 0; i < 9; i++) {
+            for (var j = 0; j < 9; j++) {
+                $("#map").append(planeMap[i][j]+"&nbsp;");
+            }
+            $("#map").append("<br>");
+        }
+    }
+</script>
+</html>
