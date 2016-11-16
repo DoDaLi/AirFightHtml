@@ -149,6 +149,10 @@
                 planeMap[i][j] = 0;
             }
         }
+        planeCnt = 0;
+        $("#btnAdd").attr({
+            value: '添加'
+        }).removeAttr('disabled');
         showMap();
     });
 
