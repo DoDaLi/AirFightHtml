@@ -11,6 +11,9 @@
     <div id="map">
         
     </div>
+    <div>
+        已添加飞机<b id="planeCnt">0</b>架,还需添加<b id="planeLast"></b>架
+    </div>
     <form role="form">
         <div class="form-group">
             <label for="name">X</label>
@@ -41,7 +44,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="name">DIRECTION</label>
+            <label for="name">方向</label>
             <select class="form-control" id="corD">
                 <option value="1">↑</option>
                 <option value="2">↓</option>
@@ -49,19 +52,29 @@
                 <option value="4">→</option>
             </select>
         </div>
-        <input id="btnAdd" type="button" name="test" value="add">
-        <input id="btnFresh" type="button" name="test" value="fresh">
+        <input id="btnAdd" class="btn btn-success" type="button" name="test" value="添加">
+        <input id="btnSub" class="btn btn-success" type="button" name="test" value="提交">
+        <input id="btnClr" class="btn btn-success" type="button" name="test" value="清空">
     </form>
 </body>
 <script type="text/javascript">
+    var mapLen = 9;
+    var mapWid = 9;
+    var planeNum = 3;
+    $("#planeLast").html(planeNum);
     var planeCnt = 0;
     var planeMap = new Array();
-    for (var i = 0; i < 9; i++) {
-        planeMap[i] = new Array(0,0,0,0,0,0,0,0,0);
+    for (var i = 0; i < mapLen; i++) {
+        planeMap[i] = new Array();
+        for (var j = 0; j < mapWid; j++) {
+            planeMap[i].push(0);
+        }
     }
+    
+
     var planeType = new Array();
     planeType[1] = [
-    [0, 0, 1, 0, 0],
+    [0, 0, 5, 0, 0],
     [1, 1, 1, 1, 1],
     [0, 0, 1, 0, 0],
     [0, 1, 1, 1, 0],
@@ -71,24 +84,25 @@
     [0, 1, 1, 1, 0],
     [0, 0, 1, 0, 0],
     [1, 1, 1, 1, 1],
-    [0, 0, 1, 0, 0],
+    [0, 0, 5, 0, 0],
     [0, 0, 0, 0, 0]
     ]
     planeType[3] = [
     [0, 1, 0, 0, 0],
     [0, 1, 0, 1, 0],
-    [1, 1, 1, 1, 0],
+    [5, 1, 1, 1, 0],
     [0, 1, 0, 1, 0],
     [0, 1, 0, 0, 0]
     ]
     planeType[4] = [
     [0, 0, 1, 0, 0],
     [1, 0, 1, 0, 0],
-    [1, 1, 1, 1, 0],
+    [1, 1, 1, 5, 0],
     [1, 0, 1, 0, 0],
     [0, 0, 1, 0, 0]
     ]
-    //console.log(planeMap)
+
+    //添加飞机触发函数
     $("#btnAdd").click(function() {
         var corX = $("#corX").val();
         var corY = $("#corY").val();
@@ -99,7 +113,42 @@
         //console.log(res);
     });
 
-    $("#btnFresh").click(function() {
+    //提交布局
+    $("#btnSub").click(function() {
+        if (planeCnt != planeNum) {
+            alert("请添加足够的飞机！");
+            //return;
+        }
+        $.ajax({
+            url: '__CONTROLLER__/addPlane',
+            type: 'POST',
+            data: {
+                mapLen: mapLen,
+                mapWid: mapWid,
+                planeMap: planeMap
+            },
+            success:function(result,status,xhr) {
+                console.log(result)
+            }
+        })
+        .done(function() {
+            console.log("success");
+        })
+        .fail(function() {
+            console.log("error");
+        })
+        .always(function() {
+            console.log("complete");
+        });
+    });
+
+    //清空布局
+    $("#btnClr").click(function() {
+        for (var i = 0; i < mapLen; i++) {
+            for (var j = 0; j < mapWid; j++) {
+                planeMap[i][j] = 0;
+            }
+        }
         showMap();
     });
 
@@ -136,39 +185,66 @@
             alert("已经添加三架飞机了！");
             return false;
         }
-        var planeMapTem = planeMap.concat();
+        var planeMapTem = new Array();
+        for (var i = 0; i < mapLen; i++) {
+            planeMapTem[i] = new Array();
+            for (var j = 0; j < mapWid; j++) {
+                planeMapTem[i][j] = planeMap[i][j];
+            }
+        }
+        console.log(1);
+        console.log(planeMapTem);
         for (var i = 0; i < 5; i++) {
             for (var j = 0; j < 5; j++) {
                 var dot = planeType[corD][i][j];
                 if (!dot) {
                     continue;
                 }
+                if (resY - 1 + i < 0 || resY - 1 + i >= mapLen || resX - 1 + j < 0 || resX - 1 + j >= mapWid) {
+                    alert("飞机超出边界！请检查");
+                    return;
+                }
                 if (planeMapTem[resY - 1 + i][resX - 1 + j] == 0) {
-                    planeMapTem[resY - 1 + i][resX - 1 + j] = 1;
+                    planeMapTem[resY - 1 + i][resX - 1 + j] = planeCnt + dot;
                     continue;
                 }
                 else{
                     alert("添加飞机错误！请检查");
-                    console.log(planeMap);
                     return;
                 }
             }
         }
         console.log(1);
         planeCnt++;
+        if (planeCnt == planeNum) {
+            $("#btnAdd").attr({
+                disabled: 'disabled',
+                value: '完成'
+            });
+        }
         planeMap = planeMapTem;
         showMap();
     }
 
+    
     //显示地图
+    var chaList = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N");
+    showMap();
     function showMap() {
         $("#map").html("");
-        for (var i = 0; i < 9; i++) {
-            for (var j = 0; j < 9; j++) {
+        for (var i = 0; i <= mapWid; i++) {
+            $("#map").append(i+"&nbsp;");
+        }
+        $("#map").append("<br>");
+        for (var i = 0; i < mapLen; i++) {
+            $("#map").append(chaList[i]+"&nbsp;");
+            for (var j = 0; j < mapWid; j++) {
                 $("#map").append(planeMap[i][j]+"&nbsp;");
             }
             $("#map").append("<br>");
         }
+        $("#planeCnt").html(planeCnt);
+        $("#planeLast").html(planeNum - planeCnt);
     }
 </script>
 </html>
