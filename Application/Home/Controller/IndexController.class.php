@@ -11,6 +11,7 @@ class IndexController extends Controller {
     	$mapLen = I('post.mapLen');
     	$mapWid = I('post.mapWid');
     	$planeMap = I('post.planeMap');
-    	var_dump($planeMap);die;
+    	$model = D("Index");
+        $res = $model->addPlane($planeMap);
     }
 }
