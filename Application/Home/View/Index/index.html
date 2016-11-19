@@ -199,6 +199,31 @@
     });
 
     //建房
+    $("#btnHost").click(function() {
+        $.ajax({
+            url: '__CONTROLLER__/addHost',
+            type: 'POST',
+            data: {
+                mapLen: mapLen,
+                mapWid: mapWid,
+                planeMap: planeMap
+            },
+            success:function(result,status,xhr) {
+                console.log(result)
+            }
+        })
+        .done(function() {
+            console.log("success");
+        })
+        .fail(function() {
+            console.log("error");
+        })
+        .always(function() {
+            console.log("complete");
+        });
+
+    });
+
 
     //加入房间
     $("#btnChallenger").click(function() {
