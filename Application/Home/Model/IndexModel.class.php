@@ -8,6 +8,8 @@ class IndexModel extends Model {
     public function addPlane($planeMap)
     {
         echo "11111111111111111";
-    	var_dump($planeMap);die;
+        $model = M("");
+        $result = $model->query("select * from plane_location;");
+    	var_dump($result);die;
     }
 }

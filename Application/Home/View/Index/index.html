@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
     <title>AirFight</title>
     <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
 </head>
 <body>
@@ -53,9 +54,61 @@
             </select>
         </div>
         <input id="btnAdd" class="btn btn-success" type="button" name="test" value="添加">
-        <input id="btnSub" class="btn btn-success" type="button" name="test" value="提交">
+        <input id="btnSub" class="btn btn-success" type="button" name="test" value="开战">
         <input id="btnClr" class="btn btn-success" type="button" name="test" value="清空">
     </form>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="subModal" tabindex="-1" role="dialog" aria-labelledby="subModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                    data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="subModalLabel">
+                    选择建房/加入房间
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="chooseHoC">
+                        <input id="btnHost" class="btn btn-success" type="button" name="test" value="建房">
+                        <input id="btnChallenger" class="btn btn-success" type="button" name="test" value="加入房间">
+                    </div>
+                </div>
+                
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div><!-- /.modal -->
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="roomModal" tabindex="-1" role="dialog" aria-labelledby="roomModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                    data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="roomModalLabel">
+                    请输入房间号码
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="chooseHoC">
+                        <div class="form-group">
+                            <label for="roomId">输入房间号码</label>
+                            <input type="text" class="form-control" id="roomId" 
+                                placeholder="输入房间号码">
+                        </div>
+                        <input id="btnRoomJoin" class="btn btn-success" type="button" name="test" value="加入房间">
+                    </div>
+                </div>
+                
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div><!-- /.modal -->
 </body>
 <script type="text/javascript">
     var mapLen = 9;
@@ -115,10 +168,12 @@
 
     //提交布局
     $("#btnSub").click(function() {
+        /*
         if (planeCnt != planeNum) {
             alert("请添加足够的飞机！");
             //return;
         }
+        
         $.ajax({
             url: '__CONTROLLER__/addPlane',
             type: 'POST',
@@ -140,6 +195,17 @@
         .always(function() {
             console.log("complete");
         });
+
+        */
+        $("#subModal").modal("show");
+    });
+
+    //建房
+
+    //加入房间
+    $("#btnChallenger").click(function() {
+        $("#subModal").modal("hide");
+        $("#roomModal").modal("show");
     });
 
     //清空布局
