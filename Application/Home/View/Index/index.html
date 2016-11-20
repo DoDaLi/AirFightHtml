@@ -209,19 +209,14 @@
                 planeMap: planeMap
             },
             success:function(result,status,xhr) {
-                console.log(result)
+                if (result > 0) {
+                    alert("建房成功！房间号：" + result);
+                }
+                else{
+                    alert("建房失败！请稍后重试。");
+                }
             }
-        })
-        .done(function() {
-            console.log("success");
-        })
-        .fail(function() {
-            console.log("error");
-        })
-        .always(function() {
-            console.log("complete");
         });
-
     });
 
 
@@ -230,6 +225,28 @@
         $("#subModal").modal("hide");
         $("#roomModal").modal("show");
     });
+    $("#btnRoomJoin").click(function() {
+        var roomId = $("#roomId").val();
+        $.ajax({
+            url: '__CONTROLLER__/addChallenger',
+            type: 'POST',
+            data: {
+                mapLen: mapLen,
+                mapWid: mapWid,
+                planeMap: planeMap,
+                roomId: roomId
+            },
+            success:function(result,status,xhr) {
+                if (result > 0) {
+                    alert("加入成功！正在开始对局")
+                }
+                else{
+                    alert("加入失败！")
+                }
+            }
+        });
+    });
+
 
     //清空布局
     $("#btnClr").click(function() {
