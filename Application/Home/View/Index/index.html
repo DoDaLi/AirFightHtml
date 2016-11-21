@@ -12,11 +12,14 @@
     <div id="map">
         
     </div>
-    <div>
+    <div id="planeAddTip">
         已添加飞机<b id="planeCnt">0</b>架,还需添加<b id="planeLast"></b>架
     </div>
+    <div id="battleTip" style="display: none;">
+        <text id="roomInfo"></text><b id="waitingCh"></b>
+    </div>
     <form role="form">
-        <div class="form-group">
+        <div class="form-group" id="chooseXGroup">
             <label for="name">X</label>
             <select class="form-control" id="corY">
                 <option value="1">A</option>
@@ -30,7 +33,7 @@
                 <option value="9">I</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="chooseYGroup">
             <label for="name">Y</label>
             <select class="form-control" id="corX">
                 <option>1</option>
@@ -44,7 +47,7 @@
                 <option>9</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="chooseDirectionGroup">
             <label for="name">方向</label>
             <select class="form-control" id="corD">
                 <option value="1">↑</option>
@@ -53,9 +56,12 @@
                 <option value="4">→</option>
             </select>
         </div>
-        <input id="btnAdd" class="btn btn-success" type="button" name="test" value="添加">
-        <input id="btnSub" class="btn btn-success" type="button" name="test" value="开战">
-        <input id="btnClr" class="btn btn-success" type="button" name="test" value="清空">
+        <div id="addBtnGroup">
+            <input id="btnAdd" class="btn btn-success" type="button" name="test" value="添加">
+            <input id="btnSub" class="btn btn-success" type="button" name="test" value="开战">
+            <input id="btnClr" class="btn btn-success" type="button" name="test" value="清空">
+        </div>
+        <input id="btnShoot" class="btn btn-success" type="button" name="test" value="射击" style="display: none;">
     </form>
 
     <!-- 模态框（Modal） -->
@@ -171,28 +177,6 @@
             alert("请添加足够的飞机！");
             //return;
         }
-        
-        $.ajax({
-            url: '__CONTROLLER__/addPlane',
-            type: 'POST',
-            data: {
-                mapLen: mapLen,
-                mapWid: mapWid,
-                planeMap: planeMap
-            },
-            success:function(result,status,xhr) {
-                console.log(result)
-            }
-        })
-        .done(function() {
-            console.log("success");
-        })
-        .fail(function() {
-            console.log("error");
-        })
-        .always(function() {
-            console.log("complete");
-        });
 
         */
         $("#subModal").modal("show");
@@ -211,6 +195,8 @@
             success:function(result,status,xhr) {
                 if (result > 0) {
                     alert("建房成功！房间号：" + result);
+                    $("#subModal").modal('hide');
+                    startGame(result,1);
                 }
                 else{
                     alert("建房失败！请稍后重试。");
@@ -238,7 +224,9 @@
             },
             success:function(result,status,xhr) {
                 if (result > 0) {
-                    alert("加入成功！正在开始对局")
+                    alert("加入成功！正在开始对局");
+                    $("#roomModal").modal("hide");
+                    startGame(result, 2);
                 }
                 else{
                     alert("加入失败！")
@@ -355,6 +343,43 @@
         }
         $("#planeCnt").html(planeCnt);
         $("#planeLast").html(planeNum - planeCnt);
+    }
+
+
+
+
+    //
+    //对战部分
+    //
+    //等待过程界面
+    var dotCnt = 0;
+    var waitingTip;
+    function waitingTipShow() {
+        var result = ".";
+        for (var i = 0; i < dotCnt; i++) {
+            result += ".";
+        }
+        $("#waitingCh").html(result);
+        if (dotCnt == 5) {
+            dotCnt = 0;
+        }
+        else dotCnt++;
+    }
+    //房主开始游戏
+    function startGame(roomId, player) {
+        $("#map").hide();
+        $("#planeAddTip").hide();
+        $("#addBtnGroup").hide();
+        $("#chooseDirectionGroup").hide();
+        $("#chooseXGroup").hide();
+        $("#chooseYGroup").hide();
+        if (player == 1) {
+            $("#roomInfo").html("房间号:" + roomId + ",等待挑战者光临");
+        }else{
+            $("#roomInfo").html("房间号:" + roomId + ",等待游戏开始");
+        }
+        $("#battleTip").show();
+        waitingTip = setInterval(function(){waitingTipShow();},1000);
     }
 </script>
 </html>
