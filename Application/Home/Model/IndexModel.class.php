@@ -47,4 +47,20 @@ class IndexModel extends Model {
         }
         else return false;
     }
+
+    public function checkChallengerStatus($roomId)
+    {
+        $model = M("");
+        $sql = "SELECT challenger_id FROM battle_room WHERE room_id = ".$roomId.";";
+        $res = $model->query($sql);
+        if ($res[0]["challenger_id"]) {
+            return 1;
+        }
+        return false;
+    }
+
+    public function checkRoomStatus($roomId, $round, $player)
+    {
+        
+    }
 }

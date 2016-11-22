@@ -42,6 +42,27 @@ class IndexController extends Controller {
         }
         echo -1;
         return;
-        
+    }
+
+    public function gameRound()
+    {
+        $roomId = I('post.roomId');
+        $round = I('post.round');
+        $player = I('post.player');
+        $model = D("Index");
+        if ($round == 1 && $player == 1) {
+            $cnt = 10;
+            while ($cnt--) {
+                $chaStatus = $model->checkChallengerStatus($roomId);
+                if ($chaStatus) {
+                    echo "挑战者来临！开始对局！";
+                    return;
+                }
+                sleep(3);
+            }
+            echo "wait";
+            return;
+        }
+        $roomStatus = $model->checkRoomStatus($roomId, $round, $player);
     }
 }

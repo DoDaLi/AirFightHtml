@@ -365,7 +365,7 @@
         }
         else dotCnt++;
     }
-    //房主开始游戏
+    //开始游戏
     function startGame(roomId, player) {
         $("#map").hide();
         $("#planeAddTip").hide();
@@ -380,6 +380,28 @@
         }
         $("#battleTip").show();
         waitingTip = setInterval(function(){waitingTipShow();},1000);
+        gameRound(roomId, 1, player);
+    }
+
+    //进行游戏
+    function gameRound(roomId, round, player) {
+        $.ajax({
+            url: '__CONTROLLER__/gameRound',
+            type: 'POST',
+            data: {
+                roomId: roomId,
+                round: round,
+                player: player
+            },
+            success:function(result,status,xhr) {
+                if (result == "wait") {
+                    gameRound(roomId, round, player);
+                }
+                else{
+                    alert(result)
+                }
+            }
+        });
     }
 </script>
 </html>
