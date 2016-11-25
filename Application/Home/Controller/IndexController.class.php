@@ -55,7 +55,7 @@ class IndexController extends Controller {
             while ($cnt--) {
                 $chaStatus = $model->checkChallengerStatus($roomId);
                 if ($chaStatus) {
-                    echo "挑战者来临！开始对局！";
+                    echo "挑战者来临！开始对局！房主先手射击。";
                     return;
                 }
                 sleep(3);
@@ -63,6 +63,7 @@ class IndexController extends Controller {
             echo "wait";
             return;
         }
+        // -1: wait  1:shoot  10:host win 11:challenger win
         $roomStatus = $model->checkRoomStatus($roomId, $round, $player);
     }
 }

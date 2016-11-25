@@ -25,7 +25,7 @@ class IndexModel extends Model {
         return false;
     }
 
-    public function joinAsHost($hostId = NULL,$planeNum = 3)
+    public function joinAsHost($hostId = NULL, $planeNum = 3)
     {
         $model = M("");
         $res0 = $model->query("SELECT MAX(room_id) FROM battle_room");
@@ -59,8 +59,23 @@ class IndexModel extends Model {
         return false;
     }
 
-    public function checkRoomStatus($roomId, $round, $player)
+    public function checkRoomStatus($roomId, $round, $player, $planeNum = 3)
     {
         
+        $model = M("");
+        $sql0 = "SELECT * FROM battle_room WHERE room_id = ".$roomId.";";
+        $battlerRes = $model->query($sql0);
+        if ($battlerRes[0]["kill_host"] == $battlerRes[0]["plane_num"]) {
+            return 10;
+        }
+        if ($battlerRes[0]["kill_challenger"] == $battlerRes[0]["plane_num"]) {
+            return 11;
+        }
+        $sql = "SELECT * FROM battle_log WHERE room_id = ".$roomId." AND `round` = ".$round.";";
+        $res = $model->query($sql);
+        if (!$res && $player == 1) {
+            return 1;
+        }
+        var_dump($res);die;
     }
 }
