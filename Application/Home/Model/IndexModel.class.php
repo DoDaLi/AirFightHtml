@@ -74,8 +74,53 @@ class IndexModel extends Model {
         $sql = "SELECT * FROM battle_log WHERE room_id = ".$roomId." AND `round` = ".$round.";";
         $res = $model->query($sql);
         if (!$res && $player == 1) {
+            $sql = "SELECT * FROM battle_log WHERE room_id = ".$roomId." AND `round` = ".($round - 1).";";
+            $res = $model->query($sql);
+            $ret = "第".($round - 1)."回合:敌方射击(".($res[0]["challenger_x"]).",".($res[0]["challenger_y"])."),结果:".tellResult($res[0]["challenger_result"]);
+            return 1;
+        }
+        if ($res[0]["host_done"] == 1 && $player == 2) {
+            
             return 1;
         }
         var_dump($res);die;
+    }
+
+    public function shoot($roomId, $round, $player, $locX, $locY)
+    {
+        $model = M("");
+        $sql = "SELECT loc_type FROM plane_location 
+                WHERE room_id = ".$roomId."
+                AND player = ".$player."
+                AND cor_x = ".$locX."
+                AND cor_y = ".$locY.";"
+        $res = $model->query($sql);
+        if (!$res) {
+            $result = 0;
+        } else {
+            $result = $res[0]["loc_type"];
+        }
+        if ($player == 1) {
+            $sql = "INSERT INTO battle_log(room_id, `round`, host_done,host_x,host_y,host_result)
+                VALUE(1001,1,1,1,1,5)"
+        } else {
+            # code...
+        }
+        
+    }
+
+
+    public function tellResult($value)
+    {
+        switch ($value) {
+            case 0:
+                return "未击中";
+            case 1:
+                return "击中机身";
+            case 5:
+                return "击中机头";
+            default:
+                return "系统错误";
+        }
     }
 }
