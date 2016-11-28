@@ -7,21 +7,30 @@
     <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Public/CSS/weui.css">
+    <style type="text/css">
+        td{
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <div id="map">
-        
-    </div>
-    <div id="planeAddTip">
-        已添加飞机<b id="planeCnt">0</b>架,还需添加<b id="planeLast"></b>架
-    </div>
     <div id="battleTip" style="display: none;">
         <text id="roomInfo"></text><b id="waitingCh"></b>
     </div>
-    <form role="form">
-        <div class="form-group" id="chooseXGroup">
-            <label for="name">X</label>
-            <select class="form-control" id="corY">
+    <table id="map" class="table table-bordered">
+        
+    </table>
+    <div id="planeAddTip" class="weui-cells__title">
+        已添加飞机<b id="planeCnt">0</b>架,还需添加<b id="planeLast"></b>架
+    </div>
+            
+    <div class="weui-cell weui-cell_select weui-cell_select-after" id="chooseXGroup">
+        <div class="weui-cell__hd">
+            <label for="corY" class="weui-label">X坐标</label>
+        </div>
+        <div class="weui-cell__bd">
+            <select class="weui-select" name="corY" id="corY">
                 <option value="1">A</option>
                 <option value="2">B</option>
                 <option value="3">C</option>
@@ -33,9 +42,13 @@
                 <option value="9">I</option>
             </select>
         </div>
-        <div class="form-group" id="chooseYGroup">
-            <label for="name">Y</label>
-            <select class="form-control" id="corX">
+    </div>
+    <div class="weui-cell weui-cell_select weui-cell_select-after" id="chooseYGroup">
+        <div class="weui-cell__hd">
+            <label for="corX" class="weui-label">Y坐标</label>
+        </div>
+        <div class="weui-cell__bd">
+            <select class="weui-select" name="corX" id="corX">
                 <option>1</option>
                 <option>2</option>
                 <option>3</option>
@@ -47,21 +60,27 @@
                 <option>9</option>
             </select>
         </div>
-        <div class="form-group" id="chooseDirectionGroup">
-            <label for="name">方向</label>
-            <select class="form-control" id="corD">
+    </div>
+    <div class="weui-cell weui-cell_select weui-cell_select-after" id="chooseDirectionGroup">
+        <div class="weui-cell__hd">
+            <label for="corD" class="weui-label">方向</label>
+        </div>
+        <div class="weui-cell__bd">
+            <select class="weui-select" name="corD" id="corD">
                 <option value="1">↑</option>
                 <option value="2">↓</option>
                 <option value="3">←</option>
                 <option value="4">→</option>
             </select>
         </div>
+    </div>
+    <form>
         <div id="addBtnGroup">
-            <input id="btnAdd" class="btn btn-success" type="button" name="test" value="添加">
-            <input id="btnSub" class="btn btn-success" type="button" name="test" value="开战">
-            <input id="btnClr" class="btn btn-success" type="button" name="test" value="清空">
+            <input id="btnAdd" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="添加">
+            <input id="btnSub" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="开战">
+            <input id="btnClr" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="清空">
         </div>
-        <input id="btnShoot" class="btn btn-success" type="button" name="test" value="射击" style="display: none;">
+        <input id="btnShoot" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="射击" style="display: inline;">
     </form>
 
     <!-- 模态框（Modal） -->
@@ -79,8 +98,8 @@
                 </div>
                 <div class="modal-body">
                     <div id="chooseHoC">
-                        <input id="btnHost" class="btn btn-success" type="button" name="test" value="建房">
-                        <input id="btnChallenger" class="btn btn-success" type="button" name="test" value="加入房间">
+                        <input id="btnHost" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="建房">
+                        <input id="btnChallenger" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="加入房间">
                     </div>
                 </div>
             </div><!-- /.modal-content -->
@@ -107,12 +126,14 @@
                             <input type="text" class="form-control" id="roomId" 
                                 placeholder="输入房间号码">
                         </div>
-                        <input id="btnRoomJoin" class="btn btn-success" type="button" name="test" value="加入房间">
+                        <input id="btnRoomJoin" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="加入房间">
                     </div>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
     </div><!-- /.modal -->
+    
+    
 </body>
 <script type="text/javascript">
     var mapLen = 9;
@@ -120,14 +141,17 @@
     var planeNum = 3;
     $("#planeLast").html(planeNum);
     var planeCnt = 0;
+    
     var planeMap = new Array();
-    for (var i = 0; i < mapLen; i++) {
-        planeMap[i] = new Array();
-        for (var j = 0; j < mapWid; j++) {
-            planeMap[i].push(0);
+    mapInit();
+    function mapInit(map = planeMap) {
+        for (var i = 0; i < mapLen; i++) {
+            map[i] = new Array();
+            for (var j = 0; j < mapWid; j++) {
+                map[i].push(0);
+            }
         }
     }
-    
 
     var planeType = new Array();
     planeType[1] = [
@@ -193,13 +217,15 @@
                 planeMap: planeMap
             },
             success:function(result,status,xhr) {
-                if (result > 0) {
-                    alert("建房成功！房间号：" + result);
+                res = eval("(" + result + ")");
+                if (res["status"] == "success") {
+                    roomId = res["roomId"];
+                    player = 1;
+                    alert("建房成功！房间号：" + roomId);
                     $("#subModal").modal('hide');
-                    startGame(result,1);
-                }
-                else{
-                    alert("建房失败！请稍后重试。");
+                    startGame();
+                } else {
+                    alert("建房失败！错误：" + res["info"]);
                 }
             }
         });
@@ -212,7 +238,7 @@
         $("#roomModal").modal("show");
     });
     $("#btnRoomJoin").click(function() {
-        var roomId = $("#roomId").val();
+        var roomIdT = $("#roomId").val();
         $.ajax({
             url: '__CONTROLLER__/addChallenger',
             type: 'POST',
@@ -220,16 +246,18 @@
                 mapLen: mapLen,
                 mapWid: mapWid,
                 planeMap: planeMap,
-                roomId: roomId
+                roomId: roomIdT
             },
             success:function(result,status,xhr) {
-                if (result > 0) {
+                res = eval("(" + result + ")");
+                if (res["status"] == "success") {
+                    roomId = res["roomId"];
+                    player = 2;
                     alert("加入成功！正在开始对局");
                     $("#roomModal").modal("hide");
-                    startGame(result, 2);
-                }
-                else{
-                    alert("加入失败！")
+                    startGame();
+                } else {
+                    alert("加入失败！错误：" + res["info"]);
                 }
             }
         });
@@ -303,7 +331,7 @@
                     return;
                 }
                 if (planeMapTem[resY - 1 + i][resX - 1 + j] == 0) {
-                    planeMapTem[resY - 1 + i][resX - 1 + j] = planeCnt + dot;
+                    planeMapTem[resY - 1 + i][resX - 1 + j] = dot;
                     continue;
                 }
                 else{
@@ -329,18 +357,31 @@
     var chaList = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N");
     showMap();
     function showMap() {
-        $("#map").html("");
-        for (var i = 0; i <= mapWid; i++) {
-            $("#map").append(i+"&nbsp;");
+        var htmlTable = "<tbody>";
+        htmlTable += "<tr><td></td>";
+        for (var i = 1; i <= mapWid; i++) {
+            htmlTable += "<td>" + i + "</td>";
         }
-        $("#map").append("<br>");
+        htmlTable += "</tr>";
         for (var i = 0; i < mapLen; i++) {
-            $("#map").append(chaList[i]+"&nbsp;");
+            htmlTable += "<tr><td>" + chaList[i] + "</td>";
             for (var j = 0; j < mapWid; j++) {
-                $("#map").append(planeMap[i][j]+"&nbsp;");
+                var dot = planeMap[i][j];
+                if (dot == 1) {
+                    htmlTable += "<td>○</td>";
+                }else {
+                    if (dot == 5) {
+                        htmlTable += "<td>●</td>";
+                    } else {
+                        htmlTable += "<td></td>";
+                    }
+                }
             }
-            $("#map").append("<br>");
+            htmlTable += "</tr>";
         }
+        htmlTable += "</tbody>";
+        $("#map").html("");
+        $("#map").html(htmlTable);
         $("#planeCnt").html(planeCnt);
         $("#planeLast").html(planeNum - planeCnt);
     }
@@ -354,6 +395,9 @@
     //等待过程界面
     var dotCnt = 0;
     var waitingTip;
+    var roomId = 0;
+    var round = 1;
+    var player = 1;
     function waitingTipShow() {
         var result = ".";
         for (var i = 0; i < dotCnt; i++) {
@@ -366,7 +410,7 @@
         else dotCnt++;
     }
     //开始游戏
-    function startGame(roomId, player) {
+    function startGame() {
         $("#map").hide();
         $("#planeAddTip").hide();
         $("#addBtnGroup").hide();
@@ -376,7 +420,7 @@
         if (player == 1) {
             $("#roomInfo").html("房间号:" + roomId + ",等待挑战者光临");
         }else{
-            $("#roomInfo").html("房间号:" + roomId + ",等待游戏开始");
+            $("#roomInfo").html("房间号:" + roomId + ",回合:1 ,等待对方行动");
         }
         $("#battleTip").show();
         waitingTip = setInterval(function(){waitingTipShow();},1000);
@@ -384,7 +428,7 @@
     }
 
     //进行游戏
-    function gameRound(roomId, round, player) {
+    function gameRound() {
         $.ajax({
             url: '__CONTROLLER__/gameRound',
             type: 'POST',
@@ -394,14 +438,47 @@
                 player: player
             },
             success:function(result,status,xhr) {
-                if (result == "wait") {
+                res = eval("(" + result + ")");
+                if (res["status"] == "wait") {
                     gameRound(roomId, round, player);
                 }
                 else{
-                    alert(result)
+                    if (round == 1) {
+                        mapInit();
+                        showMap();
+                        $("#map").show();
+                        $("#chooseXGroup").show();
+                        $("#chooseYGroup").show();
+                        $("#btnShoot").show();
+                        $("#waitingCh").hide();
+                    }
+                    $("#roomInfo").html("房间号:" + roomId + ",回合:" + round + " ,轮到你行动了，请选择位置进行射击<br>");
+                    $("#btnShoot").removeAttr('disabled');
+                    $("#btnShoot").removeClass('weui-btn_disabled');
+                    //alert(result)
                 }
             }
         });
     }
+
+    $("#btnShoot").click(function() {
+        var corX = $("#corX").val();
+        var corY = $("#corY").val();
+        $.ajax({
+            url: '__CONTROLLER__/shoot',
+            type: 'POST',
+            data: {
+                roomId: roomId,
+                round: round,
+                player: player,
+                corX: corX,
+                corY: corY
+            },
+            success:function(result,status,xhr) {
+            }
+        });
+        $("#btnShoot").attr('disabled', 'disabled');
+        $("#btnShoot").addClass('weui-btn_disabled');
+    });
 </script>
 </html>

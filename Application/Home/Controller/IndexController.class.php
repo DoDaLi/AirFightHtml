@@ -16,11 +16,15 @@ class IndexController extends Controller {
         if ($roomId > 0) {
             $res = $model->addPlane($roomId, 1, $planeMap, $mapLen, $mapWid);
             if ($res) {
-                echo $roomId;
+                $result["status"] = "success";
+                $result["roomId"] = $roomId;
+                echo json_encode($result);
                 return;
             }
         }
-        echo -1;
+        $result["status"] = "fail";
+        $result["info"] = "error";
+        echo json_encode($result);
         return;
         
     }
@@ -36,11 +40,15 @@ class IndexController extends Controller {
         if ($joinRes > 0) {
             $res = $model->addPlane($roomId, 2, $planeMap, $mapLen, $mapWid);
             if ($res) {
-                echo $roomId;
+                $result["status"] = "success";
+                $result["roomId"] = $roomId;
+                echo json_encode($result);
                 return;
             }
         }
-        echo -1;
+        $result["status"] = "fail";
+        $result["info"] = "error";
+        echo json_encode($result);
         return;
     }
 
@@ -55,12 +63,15 @@ class IndexController extends Controller {
             while ($cnt--) {
                 $chaStatus = $model->checkChallengerStatus($roomId);
                 if ($chaStatus) {
-                    echo "挑战者来临！开始对局！房主先手射击。";
+                    $result["status"] = "shoot";
+                    $result["info"] = "挑战者来临！开始对局！房主先手射击。";
+                    echo json_encode($result);
                     return;
                 }
                 sleep(3);
             }
-            echo "wait";
+            $result["status"] = "wait";
+            echo json_encode($result);
             return;
         }
         // -1: wait  1:shoot  10:host win 11:challenger win

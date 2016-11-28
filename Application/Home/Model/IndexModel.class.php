@@ -93,20 +93,37 @@ class IndexModel extends Model {
                 WHERE room_id = ".$roomId."
                 AND player = ".$player."
                 AND cor_x = ".$locX."
-                AND cor_y = ".$locY.";"
+                AND cor_y = ".$locY.";";
         $res = $model->query($sql);
         if (!$res) {
             $result = 0;
         } else {
             $result = $res[0]["loc_type"];
         }
+        $sqlRoom = "";
+        if ($result == 5) {
+            $character = ($player == 1)?"kill_host":"kill_challenger";
+            $sqlRoom = "UPDATE battle_room 
+                        SET ".$character." = ".$character." + 1
+                        WHERE room_id = ".$roomId.";";
+        }
         if ($player == 1) {
             $sql = "INSERT INTO battle_log(room_id, `round`, host_done,host_x,host_y,host_result)
-                VALUE(1001,1,1,1,1,5)"
+                VALUE(1001,1,1,1,1,5);".$sqlRoom;
         } else {
-            # code...
+            $sql = "UPDATE battle_log 
+                    SET challenger_done = 1,
+                    challenger_x = 1,
+                    challenger_y = 1,
+                    challenger_result = 1
+                    WHERE room_id = 1
+                    AND `round` = 1;".$sqlRoom;
         }
-        
+        $res = $model->execute($sql);
+        if ($res) {
+            return $result;
+        }
+        return -1;
     }
 
 
