@@ -114,7 +114,7 @@ class IndexModel extends Model {
         $model = M("");
         $sql = "SELECT loc_type FROM plane_location 
                 WHERE room_id = ".$roomId."
-                AND player = ".$player."
+                AND player = ".(($player == 1)?2:1)."
                 AND cor_x = ".$locX."
                 AND cor_y = ".$locY.";";
         $res = $model->query($sql);
