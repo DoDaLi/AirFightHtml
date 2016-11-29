@@ -144,11 +144,11 @@
     
     var planeMap = new Array();
     mapInit();
-    function mapInit(map = planeMap) {
+    function mapInit() {
         for (var i = 0; i < mapLen; i++) {
-            map[i] = new Array();
+            planeMap[i] = new Array();
             for (var j = 0; j < mapWid; j++) {
-                map[i].push(0);
+                planeMap[i].push(0);
             }
         }
     }
@@ -195,13 +195,10 @@
 
     //提交布局
     $("#btnSub").click(function() {
-        /*
         if (planeCnt != planeNum) {
             alert("请添加足够的飞机！");
-            //return;
+            return;
         }
-
-        */
         $("#subModal").modal("show");
     });
 
