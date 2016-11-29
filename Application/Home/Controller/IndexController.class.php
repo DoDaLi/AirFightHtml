@@ -74,7 +74,40 @@ class IndexController extends Controller {
             echo json_encode($result);
             return;
         }
-        // -1: wait  1:shoot  10:host win 11:challenger win
-        $roomStatus = $model->checkRoomStatus($roomId, $round, $player);
+        $cnt = 10;
+        $roomStatus = null;
+        while ($cnt--) {
+            $roomStatus = $model->checkRoomStatus($roomId, $round, $player);
+            if ($roomStatus["status"] != "wait") {
+                echo json_encode($roomStatus);
+                return;
+            }
+            sleep(3);
+        }
+        $roomStatus["test"] = "con last";
+        echo json_encode($roomStatus);
+        return;
+    }
+
+    public function shoot()
+    {
+        $roomId = I("post.roomId");                
+        $round = I("post.round");        
+        $player = I("post.player");        
+        $corX = I("post.corX");        
+        $corY = I("post.corY");
+        $model = D("Index");
+        $res = $model->shoot($roomId, $round, $player, $corX, $corY);
+        if ($res == -1) {
+            $result["status"] = "fail";
+            $result["info"] = "数据库操作失败";
+            echo json_encode($result);
+            return;
+        }
+        $result["status"] = "success";
+        $result["result"] = $model->tellResult($res - 0);
+        $result["typeN"] = ($res - 0) == 0?2:($res - 0);
+        echo json_encode($result);
+        return;
     }
 }

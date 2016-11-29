@@ -64,26 +64,49 @@ class IndexModel extends Model {
         
         $model = M("");
         $sql0 = "SELECT * FROM battle_room WHERE room_id = ".$roomId.";";
-        $battlerRes = $model->query($sql0);
-        if ($battlerRes[0]["kill_host"] == $battlerRes[0]["plane_num"]) {
-            return 10;
+        $battleRes = $model->query($sql0);
+        if ($battleRes[0]["kill_host"] == $battleRes[0]["plane_num"]) {
+            $result["status"] = "end";
+            $result["info"] = "Host win!";
+            return $result;
         }
-        if ($battlerRes[0]["kill_challenger"] == $battlerRes[0]["plane_num"]) {
-            return 11;
+        if ($battleRes[0]["kill_challenger"] == $battleRes[0]["plane_num"]) {
+            $result["status"] = "end";
+            $result["info"] = "Challenger win!";
+            return $result;
         }
-        $sql = "SELECT * FROM battle_log WHERE room_id = ".$roomId." AND `round` = ".$round.";";
-        $res = $model->query($sql);
-        if (!$res && $player == 1) {
+        if ($player == 1) {
             $sql = "SELECT * FROM battle_log WHERE room_id = ".$roomId." AND `round` = ".($round - 1).";";
             $res = $model->query($sql);
-            $ret = "第".($round - 1)."回合:敌方射击(".($res[0]["challenger_x"]).",".($res[0]["challenger_y"])."),结果:".tellResult($res[0]["challenger_result"]);
-            return 1;
+            if ($res[0]["challenger_done"] == 0) {
+                $result["status"] = "wait";
+                return $result;
+            }
+            $result["status"] = "shoot";
+            $result["round"] = $round - 1;
+            $result["x"] = $res[0]["challenger_x"];
+            $result["y"] = $res[0]["challenger_y"];
+            $result["result"] = $res[0]["challenger_result"] - 0;
+            return $result;
         }
-        if ($res[0]["host_done"] == 1 && $player == 2) {
-            
-            return 1;
+        if ($player == 2) {
+            $sql = "SELECT * FROM battle_log WHERE room_id = ".$roomId." AND `round` = ".$round.";";
+            $res = $model->query($sql);
+            if ($res[0]["host_done"] == 0) {
+                $result["status"] = "wait";
+                return $result;
+            }
+            $result["status"] = "shoot";
+            $result["round"] = $round;
+            $result["x"] = $res[0]["host_x"];
+            $result["y"] = $res[0]["host_y"];
+            $result["result"] = $res[0]["host_result"] - 0;
+            return $result;
+        } else {
+            $result["status"] = "error";
+            $result["info"] = "player type error";
+            return $result;
         }
-        var_dump($res);die;
     }
 
     public function shoot($roomId, $round, $player, $locX, $locY)
@@ -109,15 +132,15 @@ class IndexModel extends Model {
         }
         if ($player == 1) {
             $sql = "INSERT INTO battle_log(room_id, `round`, host_done,host_x,host_y,host_result)
-                VALUE(1001,1,1,1,1,5);".$sqlRoom;
+                VALUE(".$roomId.",".$round.",1,".$locX.",".$locY.",".$result.");".$sqlRoom;
         } else {
             $sql = "UPDATE battle_log 
                     SET challenger_done = 1,
-                    challenger_x = 1,
-                    challenger_y = 1,
-                    challenger_result = 1
-                    WHERE room_id = 1
-                    AND `round` = 1;".$sqlRoom;
+                    challenger_x = ".$locX.",
+                    challenger_y = ".$locY.",
+                    challenger_result = ".$result."
+                    WHERE room_id = ".$roomId."
+                    AND `round` = ".$round.";".$sqlRoom;
         }
         $res = $model->execute($sql);
         if ($res) {

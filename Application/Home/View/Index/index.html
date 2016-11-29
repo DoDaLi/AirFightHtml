@@ -80,7 +80,7 @@
             <input id="btnSub" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="开战">
             <input id="btnClr" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="清空">
         </div>
-        <input id="btnShoot" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="射击" style="display: inline;">
+        <input id="btnShoot" class="weui-btn weui-btn_mini weui-btn_primary" type="button" name="test" value="射击" style="display: none;">
     </form>
 
     <!-- 模态框（Modal） -->
@@ -191,7 +191,6 @@
         var res =  convertXY(corD,corX,corY);
 
         addPlaneToMap(corD,res[0],res[1])
-        //console.log(res);
     });
 
     //提交布局
@@ -318,8 +317,6 @@
                 planeMapTem[i][j] = planeMap[i][j];
             }
         }
-        console.log(1);
-        console.log(planeMapTem);
         for (var i = 0; i < 5; i++) {
             for (var j = 0; j < 5; j++) {
                 var dot = planeType[corD][i][j];
@@ -340,7 +337,6 @@
                 }
             }
         }
-        console.log(1);
         planeCnt++;
         if (planeCnt == planeNum) {
             $("#btnAdd").attr({
@@ -367,14 +363,22 @@
             htmlTable += "<tr><td>" + chaList[i] + "</td>";
             for (var j = 0; j < mapWid; j++) {
                 var dot = planeMap[i][j];
-                if (dot == 1) {
-                    htmlTable += "<td>○</td>";
-                }else {
-                    if (dot == 5) {
+                switch(dot) {
+                    case 1:
+                        htmlTable += "<td>○</td>";
+                        break;
+                    case 5:
                         htmlTable += "<td>●</td>";
-                    } else {
+                        break;
+                    case 0:
                         htmlTable += "<td></td>";
-                    }
+                        break;
+                    case 2:
+                        htmlTable += "<td>X</td>";
+                        break;
+                    default:
+                        htmlTable += "<td>Er</td>";
+                        break;
                 }
             }
             htmlTable += "</tr>";
@@ -424,7 +428,7 @@
         }
         $("#battleTip").show();
         waitingTip = setInterval(function(){waitingTipShow();},1000);
-        gameRound(roomId, 1, player);
+        gameRound();
     }
 
     //进行游戏
@@ -438,6 +442,7 @@
                 player: player
             },
             success:function(result,status,xhr) {
+                console.log(result);
                 res = eval("(" + result + ")");
                 if (res["status"] == "wait") {
                     gameRound(roomId, round, player);
@@ -452,7 +457,12 @@
                         $("#btnShoot").show();
                         $("#waitingCh").hide();
                     }
-                    $("#roomInfo").html("房间号:" + roomId + ",回合:" + round + " ,轮到你行动了，请选择位置进行射击<br>");
+                    if (res["status"] == "end") {
+                        alert(res["info"]);
+                        return;
+                    }
+                    $("#waitingCh").hide();
+                    $("#roomInfo").html("房间号:" + roomId + ",回合:" + round + " ,轮到你行动了，请选择位置进行射击");
                     $("#btnShoot").removeAttr('disabled');
                     $("#btnShoot").removeClass('weui-btn_disabled');
                     //alert(result)
@@ -462,8 +472,12 @@
     }
 
     $("#btnShoot").click(function() {
-        var corX = $("#corX").val();
-        var corY = $("#corY").val();
+        var corX = $("#corY").val() - 1;
+        var corY = $("#corX").val() - 1;
+        if (planeMap[corX][corY]) {
+            alert("请勿重复射击同一位置!")
+            return;
+        }
         $.ajax({
             url: '__CONTROLLER__/shoot',
             type: 'POST',
@@ -475,6 +489,19 @@
                 corY: corY
             },
             success:function(result,status,xhr) {
+                res = eval("(" + result + ")");
+                if (res["status"] == "success") {
+                    resLoc = res["result"];
+                    alert("射击结果："+ resLoc);
+                    planeMap[corX][corY] = res["typeN"];
+                    showMap();
+                    round++;
+                    $("#roomInfo").html("房间号:" + roomId + ",回合:" + round + " ,等待对方行动");
+                    $("#waitingCh").show();
+                    gameRound();
+                } else {
+                    alert(res["info"]);
+                }
             }
         });
         $("#btnShoot").attr('disabled', 'disabled');
