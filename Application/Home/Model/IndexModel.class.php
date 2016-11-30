@@ -67,12 +67,12 @@ class IndexModel extends Model {
         $battleRes = $model->query($sql0);
         if ($battleRes[0]["kill_host"] == $battleRes[0]["plane_num"]) {
             $result["status"] = "end";
-            $result["info"] = "Host win!";
+            $result["info"] = "房主获胜!";
             return $result;
         }
         if ($battleRes[0]["kill_challenger"] == $battleRes[0]["plane_num"]) {
             $result["status"] = "end";
-            $result["info"] = "Challenger win!";
+            $result["info"] = "挑战者获胜!";
             return $result;
         }
         if ($player == 1) {

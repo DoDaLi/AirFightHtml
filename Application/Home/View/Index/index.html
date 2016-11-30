@@ -11,6 +11,7 @@
     <style type="text/css">
         td{
             text-align: center;
+            width: 10%;
         }
     </style>
 </head>
@@ -51,7 +52,7 @@
             <select class="weui-select" name="corX" id="corX">
                 <option>1</option>
                 <option>2</option>
-                <option>3</option>
+                <option selected="true">3</option>
                 <option>4</option>
                 <option>5</option>
                 <option>6</option>
@@ -133,7 +134,11 @@
         </div><!-- /.modal -->
     </div><!-- /.modal -->
     
-    
+    <!-- <div id="planeAddTip" class="weui-cells__title">
+    回合3：对方攻击C-6,结果：击中机身<br>
+    回合2：对方攻击B-4,结果：未击中<br>
+    回合1：对方攻击X-1,结果：击中机头<br>
+    </div> -->
 </body>
 <script type="text/javascript">
     var mapLen = 9;
@@ -195,10 +200,12 @@
 
     //提交布局
     $("#btnSub").click(function() {
+        /*
         if (planeCnt != planeNum) {
             alert("请添加足够的飞机！");
             return;
         }
+        */
         $("#subModal").modal("show");
     });
 
@@ -360,21 +367,22 @@
             htmlTable += "<tr><td>" + chaList[i] + "</td>";
             for (var j = 0; j < mapWid; j++) {
                 var dot = planeMap[i][j];
+                htmlTable += '<td class="colClick" id="col-' + i + '-' + j + '" corX="' + i + '" corY="' + j + '">';
                 switch(dot) {
                     case 1:
-                        htmlTable += "<td>○</td>";
+                        htmlTable += "○</td>";
                         break;
                     case 5:
-                        htmlTable += "<td>●</td>";
+                        htmlTable += "●</td>";
                         break;
                     case 0:
-                        htmlTable += "<td></td>";
+                        htmlTable += "</td>";
                         break;
                     case 2:
-                        htmlTable += "<td>X</td>";
+                        htmlTable += "X</td>";
                         break;
                     default:
-                        htmlTable += "<td>Er</td>";
+                        htmlTable += "Er</td>";
                         break;
                 }
             }
@@ -412,6 +420,7 @@
     }
     //开始游戏
     function startGame() {
+        startSlected = 1;
         $("#map").hide();
         $("#planeAddTip").hide();
         $("#addBtnGroup").hide();
@@ -468,9 +477,28 @@
         });
     }
 
+    var xSelected = -1;
+    var ySelected = -1;
+    var startSlected = 0;
+
+    $(".colClick").click(function(event) {
+        if (startSlected) {
+            xSelected = $(this).attr("corx");
+            ySelected = $(this).attr("cory");
+            $(this).css('background-color', 'green');
+        }
+        console.log("startSlected:" + startSlected)
+    });
+
     $("#btnShoot").click(function() {
-        var corX = $("#corY").val() - 1;
-        var corY = $("#corX").val() - 1;
+        /*
+        if (xSelected + ySelected < 0) {
+            alert("请在地图内点击位置选择射击点");
+            return;
+        }
+        **/
+        var corX = xSelected - 0;
+        var corY = ySelected - 0;
         if (planeMap[corX][corY]) {
             alert("请勿重复射击同一位置!")
             return;
@@ -495,6 +523,7 @@
                     round++;
                     $("#roomInfo").html("房间号:" + roomId + ",回合:" + round + " ,等待对方行动");
                     $("#waitingCh").show();
+                    xSelected = ySelected = -1;
                     gameRound();
                 } else {
                     alert(res["info"]);
